@@ -35,9 +35,10 @@
     "imu_invert":false,
     "imu_in_torso": [0, 0, 0],
     "isParallelArm":false,
+    "only_half_up_body":true,
     "MOTORS_TYPE":[
-        "PA100_18", "PA100", "PA100", "PA100", "CK", "CK",
-        "PA100_18", "PA100", "PA100", "PA100", "CK", "CK",
+        "PA100_18_none", "PA100_none", "PA100_none", "PA100_none", "CK_none", "CK_none",
+        "PA100_18_none", "PA100_none", "PA100_none", "PA100_none", "CK_none", "CK_none",
         "PA100", "ruiwo", "ruiwo", "ruiwo", "ruiwo", "ruiwo", "ruiwo",
         "PA100", "ruiwo", "ruiwo", "ruiwo", "ruiwo", "ruiwo", "ruiwo", "ruiwo", "ruiwo"],
     "EndEffectorType": ["qiangnao", "qiangnao"],
