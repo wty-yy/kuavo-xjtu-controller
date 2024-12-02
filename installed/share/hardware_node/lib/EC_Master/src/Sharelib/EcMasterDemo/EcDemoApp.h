@@ -187,7 +187,7 @@ void setMotorPositionOffset(const std::vector<double>& offsets);
 void fixEmergencyRequest(const int slaveAddr, const int errorCode);
 
 // 忽略/屏蔽电机
-extern void ignoreMotor(const uint16_t *ids, uint32_t num_id);
+extern void disableMotor(const uint16_t *ids, uint32_t num_id);
 
 #define PRINT_PERF_MEAS() ((EC_NULL != pEcLogContext) ? ((CAtEmLogging *)pEcLogContext)->PrintPerfMeas(pAppContext->dwInstanceId, 0, pEcLogContext) : 0)
 #define PRINT_HISTOGRAM() ((EC_NULL != pEcLogContext) ? ((CAtEmLogging *)pEcLogContext)->PrintHistogramAsCsv(pAppContext->dwInstanceId) : 0)
