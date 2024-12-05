@@ -232,7 +232,7 @@ class SwitchedModelReferenceManager : public ReferenceManager {
   vector_array_t lastStateTrajectoryWithVel;
   int feetJointNums_ = 12;
   int armJointNums_ = 10;// will replace in initialize
-  int armRealDof_ = -1;
+  int armRealDof_ = 14;
   
   std::mutex cmdvel_mtx_;
   std::mutex cmdPose_mtx_;
@@ -260,6 +260,7 @@ class SwitchedModelReferenceManager : public ReferenceManager {
 
 
   double arm_move_spd_{1.2};
+  bool only_half_up_body_{false};
 };
 
 }  // namespace humanoid
