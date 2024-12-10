@@ -1184,7 +1184,7 @@ Stephen Brawner (brawner@gmail.com)
     <parent link="zarm_r1_link" />
     <child link="zarm_r2_link" />
     <axis xyz="1 0 0" />
-    <limit lower="-0.3489" upper="2.0933" effort="8.5" velocity="9" />
+    <limit lower="0.3489" upper="-2.0933" effort="8.5" velocity="9" />
   </joint>
   <link name="zarm_r3_link">
     <inertial>
