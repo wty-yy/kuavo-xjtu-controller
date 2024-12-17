@@ -44,12 +44,12 @@
       </material>
     </visual>
   </link>
-  <joint name="zarm_l1_joint" type="continuous">
+  <joint name="zarm_l1_joint" type="revolute">
     <origin xyz="-0.0174998525199963 0.2927 0.324500000000001" rpy="0 0 0" />
     <parent link="torso" />
     <child link="zarm_l1_link" />
     <axis xyz="0 1 0" />
-    <limit lower="-2.0933" upper="1.5233" effort="100" velocity="100" />
+    <limit lower="-3.1415" upper="1.57" effort="100" velocity="100" />
   </joint>
   <transmission type="SimpleTransmission">
     <joint name="zarm_l1_joint"/>
@@ -71,12 +71,12 @@
       </material>
     </visual>
   </link>
-  <joint name="zarm_l2_joint" type="continuous">
+  <joint name="zarm_l2_joint" type="revolute">
     <origin xyz="0 0 0" rpy="0 0 0" />
     <parent link="zarm_l1_link" />
     <child link="zarm_l2_link" />
     <axis xyz="1 0 0" />
-    <limit lower="-1.57" upper="2.0933" effort="100" velocity="100" />
+    <limit lower="-0.348" upper="2.0933" effort="100" velocity="100" />
   </joint>
   <transmission type="SimpleTransmission">
     <joint name="zarm_l2_joint"/>
@@ -98,7 +98,7 @@
       </material>
     </visual>
   </link>
-  <joint name="zarm_l3_joint" type="continuous">
+  <joint name="zarm_l3_joint" type="revolute">
     <origin xyz="0 0 0" rpy="0 0 0" />
     <parent link="zarm_l2_link" />
     <child link="zarm_l3_link" />
@@ -125,12 +125,12 @@
       </material>
     </visual>
   </link>
-  <joint name="zarm_l4_joint" type="continuous">
+  <joint name="zarm_l4_joint" type="revolute">
     <origin xyz="0.0200000000000006 0 -0.2837" rpy="0 0 0" />
     <parent link="zarm_l3_link" />
     <child link="zarm_l4_link" />
     <axis xyz="0 1 0" />
-    <limit lower="-2.44" upper="1.57" effort="100" velocity="100" />
+    <limit lower="-2.616" upper="0" effort="100" velocity="100" />
   </joint>
   <transmission type="SimpleTransmission">
     <joint name="zarm_l4_joint"/>
@@ -152,12 +152,12 @@
       </material>
     </visual>
   </link>
-  <joint name="zarm_l5_joint" type="continuous">
+  <joint name="zarm_l5_joint" type="revolute">
     <origin xyz="-0.0200000000000011 0 -0.127037274261586" rpy="0 0 0" />
     <parent link="zarm_l4_link" />
     <child link="zarm_l5_link" />
     <axis xyz="0 0 1" />
-    <limit lower="-1.657" upper="1.657" effort="100" velocity="100" />
+    <limit lower="-1.57" upper="1.57" effort="100" velocity="100" />
   </joint>
   <transmission type="SimpleTransmission">
     <joint name="zarm_l5_joint"/>
@@ -179,12 +179,12 @@
       </material>
     </visual>
   </link>
-  <joint name="zarm_l6_joint" type="continuous">
+  <joint name="zarm_l6_joint" type="revolute">
     <origin xyz="0.000199999999999024 0 -0.106462725738415" rpy="0 0 0" />
     <parent link="zarm_l5_link" />
     <child link="zarm_l6_link" />
     <axis xyz="1 0 0" />
-    <limit lower="-1.57" upper="1.57" effort="100" velocity="100" />
+    <limit lower="-0.697" upper="0.697" effort="100" velocity="100" />
   </joint>
   <transmission type="SimpleTransmission">
     <joint name="zarm_l6_joint"/>
@@ -206,12 +206,12 @@
       </material>
     </visual>
   </link>
-  <joint name="zarm_l7_joint" type="continuous">
+  <joint name="zarm_l7_joint" type="revolute">
     <origin xyz="0 0 -0.0209999999999996" rpy="0 0 0" />
     <parent link="zarm_l6_link" />
     <child link="zarm_l7_link" />
     <axis xyz="0 1 0" />
-    <limit lower="-1.657" upper="1.657" effort="100" velocity="100" />
+    <limit lower="-1.3083" upper="0.697" effort="100" velocity="100" />
   </joint>
   <link name="zarm_l7_end_effector">
     <collision>
@@ -246,12 +246,12 @@
       </material>
     </visual>
   </link>
-  <joint name="zarm_r1_joint" type="continuous">
+  <joint name="zarm_r1_joint" type="revolute">
     <origin xyz="-0.0174998525199963 -0.2927 0.324500000000001" rpy="0 0 0" />
     <parent link="torso" />
     <child link="zarm_r1_link" />
     <axis xyz="0 1 0" />
-    <limit lower="-2.0933" upper="1.5233" effort="100" velocity="100" />
+    <limit lower="-3.1415" upper="1.57" effort="100" velocity="100" />
   </joint>
   <transmission type="SimpleTransmission">
     <joint name="zarm_r1_joint"/>
@@ -273,12 +273,12 @@
       </material>
     </visual>
   </link>
-  <joint name="zarm_r2_joint" type="continuous">
+  <joint name="zarm_r2_joint" type="revolute">
     <origin xyz="0 0 0" rpy="0 0 0" />
     <parent link="zarm_r1_link" />
     <child link="zarm_r2_link" />
     <axis xyz="1 0 0" />
-    <limit lower="-1.57" upper="2.0933" effort="100" velocity="100" />
+    <limit lower="-2.0933" upper="0.3488" effort="100" velocity="100" />
   </joint>
   <transmission type="SimpleTransmission">
     <joint name="zarm_r2_joint"/>
@@ -300,7 +300,7 @@
       </material>
     </visual>
   </link>
-  <joint name="zarm_r3_joint" type="continuous">
+  <joint name="zarm_r3_joint" type="revolute">
     <origin xyz="0 0 0" rpy="0 0 0" />
     <parent link="zarm_r2_link" />
     <child link="zarm_r3_link" />
@@ -327,12 +327,12 @@
       </material>
     </visual>
   </link>
-  <joint name="zarm_r4_joint" type="continuous">
+  <joint name="zarm_r4_joint" type="revolute">
     <origin xyz="0.0200000000000024 0 -0.2837" rpy="0 0 0" />
     <parent link="zarm_r3_link" />
     <child link="zarm_r4_link" />
     <axis xyz="0 1 0" />
-    <limit lower="-2.44" upper="1.57" effort="100" velocity="100" />
+    <limit lower="-2.61" upper="0" effort="100" velocity="100" />
   </joint>
   <transmission type="SimpleTransmission">
     <joint name="zarm_r4_joint"/>
@@ -354,12 +354,12 @@
       </material>
     </visual>
   </link>
-  <joint name="zarm_r5_joint" type="continuous">
+  <joint name="zarm_r5_joint" type="revolute">
     <origin xyz="-0.0200000000000001 0 -0.127037274261587" rpy="0 0 0" />
     <parent link="zarm_r4_link" />
     <child link="zarm_r5_link" />
     <axis xyz="0 0 1" />
-    <limit lower="-1.657" upper="1.657" effort="100" velocity="100" />
+    <limit lower="-1.57" upper="1.57" effort="100" velocity="100" />
   </joint>
   <transmission type="SimpleTransmission">
     <joint name="zarm_r5_joint"/>
@@ -381,12 +381,12 @@
       </material>
     </visual>
   </link>
-  <joint name="zarm_r6_joint" type="continuous">
+  <joint name="zarm_r6_joint" type="revolute">
     <origin xyz="0 0 -0.106462725738415" rpy="0 0 0" />
     <parent link="zarm_r5_link" />
     <child link="zarm_r6_link" />
     <axis xyz="1 0 0" />
-    <limit lower="-1.57" upper="1.57" effort="100" velocity="100" />
+    <limit lower="-0.697" upper="0.697" effort="100" velocity="100" />
   </joint>
     <transmission type="SimpleTransmission">
     <joint name="zarm_r6_joint"/>
@@ -408,12 +408,12 @@
       </material>
     </visual>
   </link>
-  <joint name="zarm_r7_joint" type="continuous">
+  <joint name="zarm_r7_joint" type="revolute">
     <origin xyz="0 0 -0.0209999999999999" rpy="0 0 0" />
     <parent link="zarm_r6_link" />
     <child link="zarm_r7_link" />
     <axis xyz="0 1 0" />
-    <limit lower="-1.657" upper="1.657" effort="100" velocity="100" />
+    <limit lower="-0.6977" upper="1.3083" effort="100" velocity="100" />
   </joint>
   <link name="zarm_r7_end_effector">
     <collision>
