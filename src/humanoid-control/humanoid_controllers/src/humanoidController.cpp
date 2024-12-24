@@ -727,14 +727,7 @@ namespace humanoid_controller
         publishFeetTrajectory(target_trajectories);
       }
 
-      if (!only_half_up_body_) {
-        mrtRosInterface_->evaluatePolicy(currentObservation_.time, currentObservation_.state, optimizedState_mrt, optimizedInput_mrt, plannedMode_);
-      }
-      else {
-        // Only half up body
-        mrtRosInterface_->evaluatePolicy(0.0, currentObservation_.state, optimizedState_mrt, optimizedInput_mrt, plannedMode_);
-      }
-      
+      mrtRosInterface_->evaluatePolicy(currentObservation_.time, currentObservation_.state, optimizedState_mrt, optimizedInput_mrt, plannedMode_);
     }
     else
     {
@@ -790,6 +783,8 @@ namespace humanoid_controller
 
       // 手臂target后半部分，从arm_joint_trajectory_获取
       auto target_arm_pos = currentArmTargetTrajectories_.getDesiredState(currentObservation_.time);
+      // TEMP: 发布当前的arm target
+      ros_logger_->publishVector("/humanoid_controller/temp/target_arm_pos", target_arm_pos);
       if (target_arm_pos.size() == armNumReal_)
       {
         for (int i = 0; i < 2; i++)
@@ -797,7 +792,7 @@ namespace humanoid_controller
           // 只使用上半身模式, 此时 MPC 求解未开启, 直接使用 target_arm_pos
           if (only_half_up_body_) {
             optimizedState2WBC_mrt_.tail(armNumReal_).segment(i * armDofReal_, armDofReal_) =
-              target_arm_pos.segment(i * armDofReal_, armDofDiff_);
+              target_arm_pos.segment(i * armDofReal_, armDofReal_);
           }
           else {
             optimizedState2WBC_mrt_.tail(armNumReal_).segment(i * armDofReal_ + armDofMPC_, armDofDiff_) =
@@ -926,8 +921,8 @@ namespace humanoid_controller
       posDes = posDes + 0.5 * wbc_planned_joint_acc * dt * dt;
       velDes = velDes + wbc_planned_joint_acc * dt;
     }
-    // ros_logger_->publishVector("/humanoid_controller/posDes", posDes);
-    // ros_logger_->publishVector("/humanoid_controller/velDes", velDes);
+    ros_logger_->publishVector("/humanoid_controller/posDes", posDes);
+    ros_logger_->publishVector("/humanoid_controller/velDes", velDes);
     // ***************************** WBC END **********************************
 
 
