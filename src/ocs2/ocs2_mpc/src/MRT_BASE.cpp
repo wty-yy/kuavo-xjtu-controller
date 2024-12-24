@@ -107,8 +107,8 @@ void MRT_BASE::evaluatePolicy(scalar_t currentTime, const vector_t& currentState
   }
 
   if (currentTime > activePrimalSolutionPtr_->timeTrajectory_.back()) {
-    // std::cerr << "The requested currentTime is greater than the received plan: " << std::to_string(currentTime) << ">"
-              // << std::to_string(activePrimalSolutionPtr_->timeTrajectory_.back()) << "\n";
+    std::cerr << "The requested currentTime is greater than the received plan: " << std::to_string(currentTime) << ">"
+              << std::to_string(activePrimalSolutionPtr_->timeTrajectory_.back()) << "\n";
   }
 
   mpcInput = activePrimalSolutionPtr_->controllerPtr_->computeInput(currentTime, currentState);

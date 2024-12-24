@@ -1,6 +1,6 @@
 # KUAVO 软件出厂文档
 
-<img src="./imgs/banner-kuavo.png" align="center">
+<img src="./imgs/banner-kuavo.png" alt="Banner Kuavo" style={{ display: 'block', margin: '0 auto' }} />
 
 ## 概述
 
@@ -147,6 +147,18 @@ python3 Hardware_tool.py
 58秒开始头部电机**正向运动**示意
 
 [kuaov_关节正方向运动_说明](https://www.bilibili.com/video/BV1AXzRYeERe/?share_source=copy_web&vd_source=2d815abfceff1874dd081e6eb77cc262)
+
+### 检测手臂电机运动方向
+
+新建终端
+```bash
+cd ~/kuavo_opensource/tools/check_tool
+python3 Hardware_tool.py 
+```
+
+输入 `e` 加回车,瑞沃电机辨识方向
+
+然后输入 1 到 14 选择手臂电机，观察电机运动方向是否符合kuaov_关节正方向运动, 如果符合，则输入 `no` 加回车, 如果不符合，则输入 `yes` 加回车
 
 ### 零点校准
 
@@ -441,10 +453,3 @@ roslaunch humanoid_controllers load_kuavo_real_with_vr.launch
 - 选择对应的日期 ROSBAG 文件，下载日志(文件结尾以 `.bag` 或者 `.bag.active` 结尾)，如下图
 ![download_ros_logs](./imgs/download_ros_logs.png)
 
-### 删除闭源代码
-
-执行以下代码：
-新建终端
-```bash
-find ~ -type d -name "*kuavo*" | while read -r dir; do if [ -d "$dir/.git" ]; then REMOTE_URL=$(git -C "$dir" remote get-url origin 2>/dev/null); if [[ "$REMOTE_URL" == "ssh://git@www.lejuhub.com:10026/highlydynamic/kuavo.git" || "$REMOTE_URL" == "https://www.lejuhub.com/highlydynamic/kuavo.git" || "$REMOTE_URL" == "ssh://git@www.lejuhub.com:10026/highlydynamic/kuavo-ros-control.git" || "$REMOTE_URL" == "https://www.lejuhub.com/highlydynamic/kuavo-ros-control.git" ]]; then echo "删除匹配目录：$dir"; sudo rm -rf "$dir"; fi; fi; done
-```

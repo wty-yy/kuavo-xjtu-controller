@@ -10,6 +10,10 @@ import time
 import signal
 import datetime
 import json
+import threading
+from h12pro_controller_node.srv import playmusic, playmusicRequest, playmusicResponse
+from h12pro_controller_node.srv import ExecuteArmAction, ExecuteArmActionRequest, ExecuteArmActionResponse
+from h12pro_controller_node.msg import RobotActionState
 
 console = console.Console()
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -19,13 +23,89 @@ ROS_BAG_LOG_SAVE_PATH = "~/.log/vr_remote_control/rosbag"
 HUMANOID_ROBOT_SESSION_NAME = "humanoid_robot"
 VR_REMOTE_CONTROL_SESSION_NAME = "vr_remote_control"
 LAUNCH_HUMANOID_ROBOT_SIM_CMD = "roslaunch humanoid_controllers load_kuavo_mujoco_sim.launch joystick_type:=h12 start_way:=auto"
+# LAUNCH_HUMANOID_ROBOT_SIM_CMD = "roslaunch humanoid_controllers load_kuavo_mujoco_sim.launch joystick_type:=h12"
 LAUNCH_HUMANOID_ROBOT_REAL_CMD = "roslaunch humanoid_controllers load_kuavo_real.launch joystick_type:=h12 start_way:=auto"
 LAUNCH_VR_REMOTE_CONTROL_CMD = "roslaunch noitom_hi5_hand_udp_python launch_quest3_ik.launch"
 kuavo_ros_control_ws_path = os.getenv("KUAVO_ROS_CONTROL_WS_PATH")
+# 录制话题的格式
 record_topics_path = os.path.join(config_dir, "record_topics.json")
 with open(record_topics_path, "r") as f:
     record_topics = json.load(f)["record_topics"]
 record_vr_rosbag_pid = None
+# 自定义动作json文件
+customize_config_path = os.path.join(config_dir, "customize_config.json")
+with open(customize_config_path, "r") as f:
+    customize_config_data = json.load(f)
+
+ROBOT_ACTION_STATUS = 0 # 手臂完成状态 | 0 没开始 | 1 执行中 |  2 完成
+def robot_action_state_callback(msg):
+    global ROBOT_ACTION_STATUS
+    ROBOT_ACTION_STATUS = msg.state
+    # rospy.loginfo(f" ---------- ROBOT_ACTION_STATUS ---------- : {ROBOT_ACTION_STATUS}")
+rospy.Subscriber('/robot_action_state', RobotActionState, robot_action_state_callback)
+
+import os
+import netifaces
+import json
+import hashlib
+import math
+import numpy as np
+def get_wifi_ip():
+    try:
+        # Get all network interfaces
+        interfaces = netifaces.interfaces()
+
+        # Find the WiFi interface (usually starts with 'wl')
+        wifi_interface = next(
+            (iface for iface in interfaces if iface.startswith("wl")), None
+        )
+
+        if wifi_interface:
+            # Get the IPv4 address of the WiFi interface
+            addresses = netifaces.ifaddresses(wifi_interface)
+            if netifaces.AF_INET in addresses:
+                return addresses[netifaces.AF_INET][0]["addr"]
+
+        return "WiFi not connected"
+    except Exception as e:
+        return f"Error: {e}"
+
+def call_execute_arm_action(action_name):
+    """Call the /execute_arm_action service
+    :param action_name 动作名字
+    :return: bool， 服务调用结果
+    """
+    try:
+        _execute_arm_action_client = rospy.ServiceProxy('/execute_arm_action', ExecuteArmAction)
+        request = ExecuteArmActionRequest()
+        request.action_name = action_name
+
+        response = _execute_arm_action_client(request)
+        rospy.loginfo(f"ExecuteArmAction service response:\nsuccess: {response.success}\nmessage: {response.message}")
+        return response.success, response.message
+    except rospy.ServiceException as e:
+        rospy.logerr(f"Service call to '/execute_arm_action' failed: {e}")
+        return False, f"Service exception: {e}"
+
+def set_robot_play_music(music_file_name:str, music_volume:int)->bool:
+    """机器人播放指定文件的音乐
+    :param music_file_name, 音乐文件名字
+    :param music_volume, 音乐音量
+    :return: bool, 服务调用结果 
+    """
+    try:
+        _robot_music_play_client = rospy.ServiceProxy("/play_music", playmusic)
+        request = playmusicRequest()
+        request.music_number = music_file_name
+        request.volume = music_volume
+        # 客户端接收
+        response = _robot_music_play_client(request)
+        rospy.loginfo(f"Service call /play_music call: {response.success_flag}")
+        return response.success_flag
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        rospy.loginfo("Service /play_music call: fail!...please check again!")
+        return False
 
 def call_change_arm_ctrl_mode_service(arm_ctrl_mode):
     result = True
@@ -117,6 +197,7 @@ def launch_humanoid_robot(real_robot=True,calibrate=False):
         
     print(f"launch_cmd: {launch_cmd}")
     print("If you want to check the session, please run 'tmux attach -t humanoid_robot'")
+    ip = get_wifi_ip()
     tmux_cmd = [
         "sudo", "tmux", "new-session",
         "-s", HUMANOID_ROBOT_SESSION_NAME, 
@@ -124,6 +205,8 @@ def launch_humanoid_robot(real_robot=True,calibrate=False):
         f"source ~/.bashrc && \
             source {kuavo_ros_control_ws_path}/devel/setup.bash && \
             export ROBOT_VERSION={robot_version} && \
+            export ROS_MASTER_URI=http://{ip}:11311 && \
+            export ROS_IP={ip} && \
             {launch_cmd}; exec bash"
     ]
     
@@ -241,6 +324,71 @@ def arm_pose_callback(event):
     except Exception as e:
         rospy.logerr(f"Error in arm_pose_callback: {e}")
     pass
+
+# 等待动作完成的函数，增加超时机制
+def wait_for_action_completion(timeout=10.0):
+    """
+    等待动作完成，直到 ROBOT_ACTION_STATUS 为 2 或超时。
+    
+    :param timeout: 超时时间（秒）
+    """
+    global ROBOT_ACTION_STATUS
+    start_time = time.time()  # 记录开始时间
+    while ROBOT_ACTION_STATUS != 2:
+        if time.time() - start_time > timeout:  # 检查是否超时
+            rospy.logwarn("等待动作完成超时，自动退出等待循环")
+            break
+        rospy.sleep(0.1)  # 等待0.1秒后再检查状态
+
+# 执行动作的线程函数
+def execute_arm_poses(arm_pose_names):
+    for arm_pose in arm_pose_names:
+        rospy.loginfo(f"Executing arm pose: {arm_pose}")
+        call_execute_arm_action(arm_pose)
+        wait_for_action_completion(timeout=10.0)  # 设置超时时间为10秒 | 等待动作完成
+
+# 播放音乐的线程函数
+def play_music(music_names):
+    for music in music_names:
+        rospy.loginfo(f"Playing music: {music}")
+        set_robot_play_music(music, 100)
+
+def customize_action_callback(event):
+    global customize_config_data
+    # 打印动作类型
+    source = event.kwargs.get("source")
+    trigger = event.kwargs.get("trigger")
+    print_state_transition(trigger, source, "stance")
+    try:
+        # 根据 trigger 查找对应的配置
+        if trigger in customize_config_data:
+            action_config = customize_config_data[trigger]
+            arm_pose_names = action_config.get("arm_pose_name", [])
+            music_names = action_config.get("music_name", [])
+            
+            # 打印匹配到的动作和音乐信息
+            rospy.loginfo(f"Trigger: {trigger}")
+            rospy.loginfo(f"Arm Pose Names: {arm_pose_names}")
+            rospy.loginfo(f"Music Names: {music_names}") 
+
+            # 创建线程
+            if arm_pose_names:
+                arm_pose_thread = threading.Thread(target=execute_arm_poses, args=(arm_pose_names,))
+                arm_pose_thread.start()
+            if music_names:
+                music_thread = threading.Thread(target=play_music, args=(music_names,))
+                music_thread.start()
+
+            # 等待线程完成
+            if arm_pose_names:
+                arm_pose_thread.join()
+            if music_names:
+                music_thread.join()
+                
+        else:
+            rospy.logwarn(f"No configuration found for trigger: {trigger}")
+    except Exception as e:
+        rospy.logerr(f"Error in customize_action_callback: {e}")
 
 def record_vr_rosbag_callback(event):
     global record_vr_rosbag_pid

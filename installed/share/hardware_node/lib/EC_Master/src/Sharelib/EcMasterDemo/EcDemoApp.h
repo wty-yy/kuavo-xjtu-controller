@@ -29,6 +29,7 @@
 #include <mutex>
 #include <functional>
 #include <vector>
+#include <atomic>
 /*-DEFINES-------------------------------------------------------------------*/
 #define EC_DEMO_APP_NAME (EC_T_CHAR *)"EcMasterDemoDc"
 
@@ -76,8 +77,10 @@ typedef struct
   int16_t torque_actual_value;
   uint16_t status_word;
   int16_t mode_of_opration_display;
+  int32_t position_demand_raw;
+  int32_t velocity_demand_raw;
   int32_t velocity_actual_value;
-  int16_t current_actual_value;
+  int16_t torque_demand_raw;
   uint16_t error_code;
 } ELMO_SlaveRead_t;
 
@@ -93,6 +96,7 @@ typedef struct
   int32_t velocit_offset;
   int16_t torque_offset;
 } ELMO_SlaveWrite_t;
+
 
 /* yd */
 typedef struct
@@ -119,6 +123,18 @@ typedef struct
 } YD_SlaveWrite_t;
 #pragma pack()
 
+// 定义input区结构
+struct SlaveBuffersIn {
+    ELMO_SlaveRead_t* elmo_slave_input;
+    YD_SlaveRead_t* yd_slave_input;
+};
+
+// 定义out结构
+struct SlaveBuffersOut {
+    ELMO_SlaveWrite_t* elmo_slave_output;
+    YD_SlaveWrite_t* yd_slave_output;
+};
+
 enum EcMasterType
 {
   ELMO = 0,
@@ -128,20 +144,20 @@ enum EcMasterType
 
 typedef struct
 {
-  double position = 0.0;
-  double velocity = 0.0;
-  double torque = 0.0;
-  double maxTorque = 0.0;
-  double positionOffset = 0.0;
-  double velocityOffset = 0.0;
-  double torqueOffset = 0.0;
-  double acceleration = 0.0;
+  double position;
+  double velocity;
+  double torque;
+  double maxTorque;
+  double positionOffset;
+  double velocityOffset;
+  double torqueOffset;
+  double acceleration;
   double kp = 0.0;
   double kd = 0.0;
-  uint8_t status = 0;
-  uint16_t status_word = 0;
-  uint16_t error_code = 0;
-  double torque_demand_trans = 0.0;
+  uint8_t status;
+  uint16_t status_word;
+  uint16_t error_code;
+  double  torque_demand_trans;
 } MotorParam_t;
 
 extern enum EcMasterType driver_type[30];
@@ -185,9 +201,6 @@ void setMotorPositionOffset(const std::vector<double>& offsets);
 
 /* function in EcNotification */
 void fixEmergencyRequest(const int slaveAddr, const int errorCode);
-
-// 忽略/屏蔽电机
-extern void disableMotor(const uint16_t *ids, uint32_t num_id);
 
 #define PRINT_PERF_MEAS() ((EC_NULL != pEcLogContext) ? ((CAtEmLogging *)pEcLogContext)->PrintPerfMeas(pAppContext->dwInstanceId, 0, pEcLogContext) : 0)
 #define PRINT_HISTOGRAM() ((EC_NULL != pEcLogContext) ? ((CAtEmLogging *)pEcLogContext)->PrintHistogramAsCsv(pAppContext->dwInstanceId) : 0)
