@@ -57,7 +57,7 @@ def get_wifi_ip():
 
         # Find the WiFi interface (usually starts with 'wl')
         wifi_interface = next(
-            (iface for iface in interfaces if iface.startswith("wl")), None
+            (iface for iface in interfaces if iface.startswith("enx00e04c686129")), None
         )
 
         if wifi_interface:
